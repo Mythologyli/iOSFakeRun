@@ -26,7 +26,13 @@ namespace iOSFakeRun
             ideviceInstance.idevice_new(out var iDevice, udids[0]).ThrowOnError();
             lockdownInstance.lockdownd_client_new_with_handshake(iDevice, out var lockdownClient, "iOSFakeRun").ThrowOnError();
 
-            if (!Image.MountImage(iDevice, lockdownClient, "15.2"))
+            if (!Utils.GetVersion(lockdownClient, out var iosVersion))
+            {
+                Console.WriteLine("Fail to get iOS version.");
+                return;
+            }
+
+            if (!Image.MountImage(iDevice, lockdownClient, iosVersion))
             {
                 Console.WriteLine("Fail to mount image.");
                 return;
