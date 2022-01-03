@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace iOSFakeRun;
 
 internal static class CoordinateConvertor

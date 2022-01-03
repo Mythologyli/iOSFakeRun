@@ -1,7 +1,6 @@
 ﻿using iMobileDevice;
 using iMobileDevice.Lockdown;
 
-
 namespace iOSFakeRun;
 
 internal static class Utils
