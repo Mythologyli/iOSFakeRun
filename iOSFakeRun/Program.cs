@@ -46,11 +46,13 @@ namespace iOSFakeRun
 
             Debug.Assert(locationServiceClient != null, nameof(locationServiceClient) + " != null");
 
-            if (!Location.SetLocation(locationServiceClient, 32.0, 105.0))
+            var coordinate = CoordinateConvertor.Bd09ToWgs84(30.270686, 120.130714);
+            if (!Location.SetLocation(locationServiceClient, coordinate[0], coordinate[1]))
             {
                 Console.WriteLine("Fail to set location.");
+                return;
             }
-            
+
             iDevice.Dispose();
             lockdownClient.Dispose();
 
