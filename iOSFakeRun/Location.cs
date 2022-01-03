@@ -1,37 +1,28 @@
 ﻿using System;
+using System.Text;
 using iMobileDevice;
 using iMobileDevice.iDevice;
 using iMobileDevice.Lockdown;
 using iMobileDevice.Service;
-using System.Text;
-
 
 namespace iOSFakeRun;
 
 internal static class Location
 {
-    public static bool StartService(iDeviceHandle iDevice, LockdownClientHandle lockdownClient, out ServiceClientHandle? locationServiceClient)
+    public static bool ResetLocation(iDeviceHandle? idevice, LockdownClientHandle? lockdownClient)
     {
-        if (LibiMobileDevice.Instance.Lockdown.lockdownd_start_service(lockdownClient, "com.apple.dt.simulatelocation", out var lockdownServiceDescriptor) ==
-            LockdownError.Success)
-            if (LibiMobileDevice.Instance.Service.service_client_new(iDevice, lockdownServiceDescriptor, out var client) == ServiceError.Success)
-            {
-                locationServiceClient = client;
-                return true;
-            }
-
-        locationServiceClient = null;
-        return false;
+        return LibiMobileDevice.Instance.Lockdown.lockdownd_start_service(lockdownClient, "com.apple.dt.simulatelocation", out var lockdownServiceDescriptor) ==
+               LockdownError.Success &&
+               LibiMobileDevice.Instance.Service.service_client_new(idevice, lockdownServiceDescriptor, out var locationServiceClient) == ServiceError.Success &&
+               SendUInt(locationServiceClient, 1u);
     }
 
-    public static bool ResetLocation(ServiceClientHandle locationServiceClient)
+    public static bool SetLocation(iDeviceHandle? idevice, LockdownClientHandle? lockdownClient, double latitude, double longitude)
     {
-        return SendUInt(locationServiceClient, 1u);
-    }
-
-    public static bool SetLocation(ServiceClientHandle locationServiceClient, double latitude, double longitude)
-    {
-        return SendUInt(locationServiceClient, 0u) != false &&
+        return LibiMobileDevice.Instance.Lockdown.lockdownd_start_service(lockdownClient, "com.apple.dt.simulatelocation", out var lockdownServiceDescriptor) ==
+               LockdownError.Success &&
+               LibiMobileDevice.Instance.Service.service_client_new(idevice, lockdownServiceDescriptor, out var locationServiceClient) == ServiceError.Success &&
+               SendUInt(locationServiceClient, 0u) != false &&
                SendString(locationServiceClient, latitude.ToString()) != false &&
                SendString(locationServiceClient, longitude.ToString()) != false;
     }
@@ -40,7 +31,10 @@ internal static class Location
     {
         var sent = 0u;
         var bytes = BitConverter.GetBytes(value);
-        if (BitConverter.IsLittleEndian) Array.Reverse(bytes);
+        if (BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(bytes);
+        }
 
         return LibiMobileDevice.Instance.Service.service_send(locationServiceClient, bytes, (uint) bytes.Length, ref sent) == ServiceError.Success;
     }
@@ -50,7 +44,10 @@ internal static class Location
         var sent = 0u;
         var bytes = Encoding.UTF8.GetBytes(value);
         var bytesLengthBytes = BitConverter.GetBytes((uint) value.Length);
-        if (BitConverter.IsLittleEndian) Array.Reverse(bytesLengthBytes);
+        if (BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(bytesLengthBytes);
+        }
 
         return LibiMobileDevice.Instance.Service.service_send(locationServiceClient, bytesLengthBytes, (uint) bytesLengthBytes.Length, ref sent) == ServiceError.Success &&
                LibiMobileDevice.Instance.Service.service_send(locationServiceClient, bytes, (uint) bytes.Length, ref sent) == ServiceError.Success;

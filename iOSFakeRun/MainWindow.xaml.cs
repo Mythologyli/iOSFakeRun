@@ -3,6 +3,7 @@ using System.Windows;
 using iMobileDevice;
 using iMobileDevice.iDevice;
 using iMobileDevice.Lockdown;
+using iMobileDevice.Service;
 
 
 namespace iOSFakeRun;
@@ -11,6 +12,8 @@ public partial class MainWindow : Window
 {
     private readonly IiDeviceApi _ideviceInstance = LibiMobileDevice.Instance.iDevice;
     private readonly ILockdownApi _lockdownInstance = LibiMobileDevice.Instance.Lockdown;
+    private iDeviceHandle? _idevice;
+    private LockdownClientHandle? _lockdownClient;
 
     public MainWindow()
     {
@@ -19,7 +22,7 @@ public partial class MainWindow : Window
         NativeLibraries.Load();
     }
 
-    private void LinkAndChangeLocation(object sender, RoutedEventArgs e)
+    private void Link(object sender, RoutedEventArgs e)
     {
         var count = 0;
         _ideviceInstance.idevice_get_device_list(out var udids, ref count);
@@ -29,39 +32,67 @@ public partial class MainWindow : Window
             return;
         }
 
-        _ideviceInstance.idevice_new(out var iDevice, udids[0]).ThrowOnError();
-        _lockdownInstance.lockdownd_client_new_with_handshake(iDevice, out var lockdownClient, "iOSFakeRun").ThrowOnError();
+        _ideviceInstance.idevice_new(out _idevice, udids[0]).ThrowOnError();
+        _lockdownInstance.lockdownd_client_new_with_handshake(_idevice, out _lockdownClient, "iOSFakeRun").ThrowOnError();
 
-        if (!Utils.GetVersion(lockdownClient, out var iosVersion))
+        if (!Utils.GetVersion(_lockdownClient, out var iosVersion))
         {
             MessageBox.Show("Fail to get iOS version.");
             return;
         }
 
-        if (!Image.MountImage(iDevice, lockdownClient, iosVersion))
+        if (!Image.MountImage(_idevice, _lockdownClient, iosVersion))
         {
             MessageBox.Show("Fail to mount image.");
             return;
         }
 
-        if (!Location.StartService(iDevice, lockdownClient, out var locationServiceClient))
+        MessageBox.Show("Successfully link.");
+    }
+
+    private void ChangeLocation(object sender, RoutedEventArgs e)
+    {
+        if (_idevice == null)
         {
-            MessageBox.Show("Fail to start service.");
+            MessageBox.Show("Link first!");
             return;
         }
 
-        Debug.Assert(locationServiceClient != null, nameof(locationServiceClient) + " != null");
-
         var coordinate = CoordinateConvertor.Bd09ToWgs84(30.270686, 120.130714);
-        if (!Location.SetLocation(locationServiceClient, coordinate[0], coordinate[1]))
+        if (!Location.SetLocation(_idevice, _lockdownClient, coordinate[0], coordinate[1]))
         {
             MessageBox.Show("Fail to set location.");
             return;
         }
 
-        iDevice.Dispose();
-        lockdownClient.Dispose();
-
         MessageBox.Show("Successfully change location.");
+    }
+
+    private void ResetLocation(object sender, RoutedEventArgs e)
+    {
+        if (_idevice == null)
+        {
+            MessageBox.Show("Link first!");
+            return;
+        }
+
+        if (!Location.ResetLocation(_idevice, _lockdownClient))
+        {
+            MessageBox.Show("Fail to reset location.");
+            return;
+        }
+
+        MessageBox.Show("Successfully reset location.");
+    }
+
+    private void UnLink(object sender, RoutedEventArgs e)
+    {
+        _idevice?.Dispose();
+        _lockdownClient?.Dispose();
+
+        _idevice = null;
+        _lockdownClient = null;
+
+        MessageBox.Show("Successfully unlink.");
     }
 }

@@ -13,8 +13,12 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Button x:Name="ButtonLink" Click="LinkAndChangeLocation">Link and change location</Button>
+        <Button Grid.Row="0" Grid.Column="0" x:Name="ButtonLink" Click="Link">Link</Button>
+        <Button Grid.Row="0" Grid.Column="1" x:Name="ButtonUnLink" Click="UnLink">Unlink</Button>
+        <Button Grid.Row="1" Grid.Column="0" x:Name="ButtonChangeLocation" Click="ChangeLocation">Change location</Button>
+        <Button Grid.Row="1" Grid.Column="1" x:Name="ButtonResetLocation" Click="ResetLocation">Reset location</Button>
     </Grid>
 </Window>

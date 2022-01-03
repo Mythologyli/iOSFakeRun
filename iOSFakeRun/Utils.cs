@@ -6,11 +6,14 @@ namespace iOSFakeRun;
 
 internal static class Utils
 {
-    public static bool GetVersion(LockdownClientHandle lockdownClient, out string iosVersion)
+    public static bool GetVersion(LockdownClientHandle? lockdownClient, out string iosVersion)
     {
         iosVersion = "";
 
-        if (LibiMobileDevice.Instance.Lockdown.lockdownd_get_value(lockdownClient, null, "ProductVersion", out var plistHandle) != LockdownError.Success) return false;
+        if (LibiMobileDevice.Instance.Lockdown.lockdownd_get_value(lockdownClient, null, "ProductVersion", out var plistHandle) != LockdownError.Success)
+        {
+            return false;
+        }
 
         using (plistHandle)
         {
