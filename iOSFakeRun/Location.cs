@@ -22,9 +22,9 @@ internal static class Location
         return LibiMobileDevice.Instance.Lockdown.lockdownd_start_service(lockdownClient, "com.apple.dt.simulatelocation", out var lockdownServiceDescriptor) ==
                LockdownError.Success &&
                LibiMobileDevice.Instance.Service.service_client_new(idevice, lockdownServiceDescriptor, out var locationServiceClient) == ServiceError.Success &&
-               SendUInt(locationServiceClient, 0u) != false &&
-               SendString(locationServiceClient, latitude.ToString()) != false &&
-               SendString(locationServiceClient, longitude.ToString()) != false;
+               SendUInt(locationServiceClient, 0u) &&
+               SendString(locationServiceClient, latitude.ToString()) &&
+               SendString(locationServiceClient, longitude.ToString());
     }
 
     private static bool SendUInt(ServiceClientHandle locationServiceClient, uint value)
