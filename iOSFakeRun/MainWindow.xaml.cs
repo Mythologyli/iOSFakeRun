@@ -1,7 +1,12 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections;
+using System.IO;
+using System.Threading;
+using System.Windows;
 using iMobileDevice;
 using iMobileDevice.iDevice;
 using iMobileDevice.Lockdown;
+using Newtonsoft.Json.Linq;
 
 namespace iOSFakeRun;
 
@@ -17,6 +22,15 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         NativeLibraries.Load();
+
+        if (!File.Exists("./route.save"))
+        {
+            return;
+        }
+
+        var reader = new StreamReader("./route.save");
+        TextBoxRoute.Text = reader.ReadLine();
+        reader.Close();
     }
 
     private void Link(object sender, RoutedEventArgs e)
@@ -47,24 +61,6 @@ public partial class MainWindow : Window
         MessageBox.Show("Successfully link.");
     }
 
-    private void ChangeLocation(object sender, RoutedEventArgs e)
-    {
-        if (_idevice == null)
-        {
-            MessageBox.Show("Link first!");
-            return;
-        }
-
-        var coordinate = CoordinateConvertor.Bd09ToWgs84(30.270686, 120.130714);
-        if (!Location.SetLocation(_idevice, _lockdownClient, coordinate[0], coordinate[1]))
-        {
-            MessageBox.Show("Fail to set location.");
-            return;
-        }
-
-        MessageBox.Show("Successfully change location.");
-    }
-
     private void ResetLocation(object sender, RoutedEventArgs e)
     {
         if (_idevice == null)
@@ -75,7 +71,7 @@ public partial class MainWindow : Window
 
         if (!Location.ResetLocation(_idevice, _lockdownClient))
         {
-            MessageBox.Show("Fail to reset location.");
+            MessageBox.Show("Fail to reset location.\nCheck your link and try to click link again.");
             return;
         }
 
@@ -91,5 +87,92 @@ public partial class MainWindow : Window
         _lockdownClient = null;
 
         MessageBox.Show("Successfully unlink.");
+    }
+
+    private void Quit(object sender, RoutedEventArgs e)
+    {
+        _idevice?.Dispose();
+        _lockdownClient?.Dispose();
+
+        _idevice = null;
+        _lockdownClient = null;
+
+        Close();
+    }
+
+    private void StartRun(object sender, RoutedEventArgs e)
+    {
+        var routeText = TextBoxRoute.Text;
+        var routeList = new ArrayList();
+
+        var writer = new StreamWriter("./route.save", false);
+        writer.WriteLine(routeText);
+        writer.Close();
+
+        try
+        {
+            if (!routeText.Substring(0, 1).Equals("["))
+            {
+                routeText = "[" + routeText + "]";
+            }
+
+            var array = JArray.Parse(routeText);
+            foreach (var position in array)
+            {
+                var latitudeToken = position.SelectToken("lat");
+                var longitudeToken = position.SelectToken("lng");
+
+                if (latitudeToken == null || longitudeToken == null)
+                {
+                    MessageBox.Show("Error occurred when parsing JSON.");
+                    return;
+                }
+
+                var latitude = double.Parse(latitudeToken.ToString());
+                var longitude = double.Parse(longitudeToken.ToString());
+
+                double[] route = {latitude, longitude};
+                routeList.Add(route);
+            }
+        }
+        catch (Exception)
+        {
+            MessageBox.Show("Error occurred when parsing JSON.");
+            return;
+        }
+
+        var routeFixedList = new ArrayList();
+        foreach (double[] route in routeList)
+        {
+            routeFixedList.Add(CoordinateConvertor.Bd09ToWgs84(route[0], route[1]));
+        }
+
+        var runThread = new Thread(() =>
+        {
+            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { LabelRun.Content = "Running now..."; });
+            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { ProgressBarRun.Value = 0.0; });
+            var routeNumber = routeFixedList.Count;
+            var i = 0;
+
+            foreach (double[] route in routeFixedList)
+            {
+                if (!Location.SetLocation(_idevice, _lockdownClient, route[0], route[1]))
+                {
+                    MessageBox.Show("Fail to set location.\nCheck your link and try to click link again.");
+                    LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { LabelRun.Content = "Not running now."; });
+
+                    return;
+                }
+
+                Thread.Sleep(2000);
+                i++;
+                var iOut = i;
+                LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { ProgressBarRun.Value = (double) iOut / routeNumber * ProgressBarRun.Maximum; });
+            }
+
+            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { LabelRun.Content = "Finish running!"; });
+        });
+
+        runThread.Start();
     }
 }
