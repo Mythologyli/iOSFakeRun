@@ -16,9 +16,43 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Button Grid.Row="0" Grid.Column="0" x:Name="ButtonLink" Click="Link">Link</Button>
-        <Button Grid.Row="0" Grid.Column="1" x:Name="ButtonUnLink" Click="UnLink">Unlink</Button>
-        <Button Grid.Row="1" Grid.Column="0" x:Name="ButtonChangeLocation" Click="ChangeLocation">Change location</Button>
-        <Button Grid.Row="1" Grid.Column="1" x:Name="ButtonResetLocation" Click="ResetLocation">Reset location</Button>
+        <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" x:Name="TextBoxRoute" TextWrapping="Wrap" />
+
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Row="0" Grid.Column="0" x:Name="ButtonLink" Click="Link">Link</Button>
+            <Button Grid.Row="0" Grid.Column="1" x:Name="ButtonUnLink" Click="UnLink">Unlink</Button>
+            <Button Grid.Row="1" Grid.Column="0" x:Name="ButtonResetLocation" Click="ResetLocation">Reset location</Button>
+            <Button Grid.Row="1" Grid.Column="1" x:Name="ButtonQuit" Click="Quit">Quit</Button>
+
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ProgressBar Grid.Row="0" Grid.Column="0" Name="ProgressBarRun" />
+
+            <Label Grid.Row="1" Grid.Column="0" x:Name="LabelRun">Not running now.</Label>
+
+            <Button Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" x:Name="ButtonRun" Click="StartRun">Run</Button>
+        </Grid>
     </Grid>
 </Window>

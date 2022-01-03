@@ -11,7 +11,9 @@ internal static class Location
 {
     public static bool ResetLocation(iDeviceHandle? idevice, LockdownClientHandle? lockdownClient)
     {
-        return LibiMobileDevice.Instance.Lockdown.lockdownd_start_service(lockdownClient, "com.apple.dt.simulatelocation", out var lockdownServiceDescriptor) ==
+        return idevice != null &&
+               lockdownClient != null &&
+               LibiMobileDevice.Instance.Lockdown.lockdownd_start_service(lockdownClient, "com.apple.dt.simulatelocation", out var lockdownServiceDescriptor) ==
                LockdownError.Success &&
                LibiMobileDevice.Instance.Service.service_client_new(idevice, lockdownServiceDescriptor, out var locationServiceClient) == ServiceError.Success &&
                SendUInt(locationServiceClient, 1u);
@@ -19,7 +21,9 @@ internal static class Location
 
     public static bool SetLocation(iDeviceHandle? idevice, LockdownClientHandle? lockdownClient, double latitude, double longitude)
     {
-        return LibiMobileDevice.Instance.Lockdown.lockdownd_start_service(lockdownClient, "com.apple.dt.simulatelocation", out var lockdownServiceDescriptor) ==
+        return idevice != null &&
+               lockdownClient != null &&
+               LibiMobileDevice.Instance.Lockdown.lockdownd_start_service(lockdownClient, "com.apple.dt.simulatelocation", out var lockdownServiceDescriptor) ==
                LockdownError.Success &&
                LibiMobileDevice.Instance.Service.service_client_new(idevice, lockdownServiceDescriptor, out var locationServiceClient) == ServiceError.Success &&
                SendUInt(locationServiceClient, 0u) &&
