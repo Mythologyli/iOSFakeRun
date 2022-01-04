@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="iOS Fake Run" Height="450" Width="800" Icon="Resources/icon.png">
 
@@ -101,12 +102,31 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ProgressBar Grid.Row="0" Grid.Column="0" Margin="20,0,20,0" Name="ProgressBarRun" />
+            <ProgressBar Grid.Row="0" Grid.Column="0" Margin="20,0,20,0" Name="ProgressBarRun">
+                <ProgressBar.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                </ProgressBar.Resources>
+            </ProgressBar>
 
-            <Label Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,5,20,5" x:Name="LabelRun">未在跑步状态</Label>
+            <Grid Grid.Row="1" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonRun" Click="StartRun">开始跑步</Button>
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">停止跑步</Button>
+                <Label Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="20,10,0,10" x:Name="LabelRunTimes">循环次数</Label>
+                <xctk:IntegerUpDown Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,10,0,10" Increment="1" Minimum="1" Value="9" x:Name="IntegerUpDownRunTimes" />
+                <Label Background="Transparent" Grid.Row="0" Grid.Column="2" Margin="20,10,0,10" x:Name="LabelSpeed">跑步速度 m/s</Label>
+                <xctk:DoubleUpDown Background="Transparent" Grid.Row="0" Grid.Column="3" Margin="20,10,20,10" Increment="0.5" Maximum="10.0" Minimum="0.1" Value="4.5"
+                                   x:Name="DoubleUpDownSpeed" />
+            </Grid>
+
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,20,5" x:Name="ButtonRun" Click="StartRun">开始跑步</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,20,5" x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">停止跑步</Button>
         </Grid>
     </Grid>
 </Window>

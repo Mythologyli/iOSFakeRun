@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using iMobileDevice;
@@ -118,17 +119,17 @@ public partial class MainWindow : Window
 
     private void StartRun(object sender, RoutedEventArgs e)
     {
-        var routeText = TextBoxRoute.Text;
-        var routeList = new ArrayList();
+        var pointText = TextBoxRoute.Text;
+        var pointList = new List<double[]>();
 
         try
         {
-            if (!routeText.Substring(0, 1).Equals("["))
+            if (!pointText.Substring(0, 1).Equals("["))
             {
-                routeText = "[" + routeText + "]";
+                pointText = "[" + pointText + "]";
             }
 
-            var array = JArray.Parse(routeText);
+            var array = JArray.Parse(pointText);
             foreach (var position in array)
             {
                 var latitudeToken = position.SelectToken("lat");
@@ -136,7 +137,7 @@ public partial class MainWindow : Window
 
                 if (latitudeToken == null || longitudeToken == null)
                 {
-                    MessageBox.Show("解析路径数据失败\n请确保路径格式合法");
+                    MessageBox.Show("解析路径数据失败\n请将路径从网页复制到左侧文本框内并确保数据格式合法");
                     return;
                 }
 
@@ -144,70 +145,113 @@ public partial class MainWindow : Window
                 var longitude = double.Parse(longitudeToken.ToString());
 
                 double[] route = {latitude, longitude};
-                routeList.Add(route);
+                pointList.Add(route);
             }
         }
         catch (Exception)
         {
-            MessageBox.Show("解析路径数据失败\n请确保路径格式合法");
+            MessageBox.Show("解析路径数据失败\n请将路径从网页复制到左侧文本框内并确保数据格式合法");
             return;
         }
 
         var writer = new StreamWriter("./route.save", false);
-        writer.WriteLine(routeText);
+        writer.WriteLine(pointText);
         writer.Close();
 
-        var routeFixedList = new ArrayList();
-        foreach (double[] route in routeList)
+        var pointFixedList = pointList.Select(point => CoordinateUtils.Bd09ToWgs84(point[0], point[1])).ToList();
+
+        var metersPerSecond = DoubleUpDownSpeed.Value ?? 0.0;
+        var totalRunTimes = IntegerUpDownRunTimes.Value ?? 1;
+
+        if (totalRunTimes > 1)
         {
-            routeFixedList.Add(CoordinateConvertor.Bd09ToWgs84(route[0], route[1]));
+            pointFixedList.Add(pointFixedList[0]);
         }
 
         var runThread = new Thread(() =>
         {
-            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate
+            StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart) delegate
             {
                 ButtonRun.Visibility = Visibility.Hidden;
                 ButtonStop.Visibility = Visibility.Visible;
-                LabelRun.Content = "正在跑步中...";
+                IntegerUpDownRunTimes.IsEnabled = false;
+                DoubleUpDownSpeed.IsEnabled = false;
+                StatusBarTextBlock.Text = "正在跑步中...";
                 ProgressBarRun.Value = 0.0;
             });
-            var routeNumber = routeFixedList.Count;
-            var i = 0;
 
-            foreach (double[] route in routeFixedList)
+            var pointFixedNumber = pointFixedList.Count;
+
+            var pointTrueList = new List<double[]> {pointFixedList[0]};
+
+            for (var i = 0; i < pointFixedNumber - 1;)
             {
-                if (!_isRunning || !Location.SetLocation(_idevice, _lockdownClient, route[0], route[1]))
+                var distance = CoordinateUtils.CalcDistance(pointFixedList[i], pointFixedList.Last());
+
+                var j = i + 1;
+                for (; j < pointFixedNumber; j++)
                 {
-                    if (_isRunning)
+                    distance = CoordinateUtils.CalcDistance(pointFixedList[i], pointFixedList[j]);
+
+                    if (!(distance > metersPerSecond))
                     {
-                        _isRunning = false;
-                        MessageBox.Show("修改定位失败\n请检查是否连接并尝试再次点击连接按钮");
+                        continue;
                     }
 
-                    LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate
-                    {
-                        LabelRun.Content = "未在跑步状态";
-                        ButtonRun.Visibility = Visibility.Visible;
-                        ButtonStop.Visibility = Visibility.Hidden;
-                        ProgressBarRun.Value = 0.0;
-                    });
-
-                    return;
+                    break;
                 }
 
-                Thread.Sleep(2000);
-                i++;
-                var iOut = i;
-                LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { ProgressBarRun.Value = (double) iOut / routeNumber * ProgressBarRun.Maximum; });
+                pointList = CoordinateUtils.CutLineToPoints(pointFixedList[i], pointFixedList[j], (int) (distance / metersPerSecond));
+                pointTrueList.AddRange(pointList);
+
+                i = j;
+            }
+
+            var pointTrueNumber = pointTrueList.Count;
+            for (var time = 0; time < totalRunTimes; time++)
+            {
+                for (var i = 0; i < pointTrueNumber; i++)
+                {
+                    if (!_isRunning || !Location.SetLocation(_idevice, _lockdownClient, pointTrueList[i][0], pointTrueList[i][1]))
+                    {
+                        if (_isRunning)
+                        {
+                            _isRunning = false;
+                            MessageBox.Show("修改定位失败\n请检查是否连接并尝试再次点击连接按钮");
+                        }
+
+                        StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart) delegate
+                        {
+                            StatusBarTextBlock.Text = "未在跑步状态";
+                            ButtonRun.Visibility = Visibility.Visible;
+                            ButtonStop.Visibility = Visibility.Hidden;
+                            IntegerUpDownRunTimes.IsEnabled = true;
+                            DoubleUpDownSpeed.IsEnabled = true;
+                            ProgressBarRun.Value = 0.0;
+                        });
+
+                        return;
+                    }
+
+                    Thread.Sleep(1000);
+                    i++;
+                    var iOut = i;
+                    var timeNow = time;
+                    ProgressBarRun.Dispatcher.BeginInvoke((ThreadStart) delegate
+                    {
+                        ProgressBarRun.Value = ((double) iOut / (pointTrueNumber * totalRunTimes) + (double) timeNow / totalRunTimes) * ProgressBarRun.Maximum;
+                    });
+                }
             }
 
             _isRunning = false;
-            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate
+            StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart) delegate
             {
-                LabelRun.Content = "跑步完成";
+                StatusBarTextBlock.Text = "跑步完成";
                 ButtonRun.Visibility = Visibility.Visible;
                 ButtonStop.Visibility = Visibility.Hidden;
+                IntegerUpDownRunTimes.IsEnabled = true;
+                DoubleUpDownSpeed.IsEnabled = true;
             });
         });
 
@@ -222,6 +266,6 @@ public partial class MainWindow : Window
 
     private void About(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("iOS Fake Run v0.1\n作者: Myth\n\n请勿将本工具用于任何非法用途");
+        MessageBox.Show("iOS Fake Run\n版本: v0.1\n作者: Myth\n\n请勿将本工具用于任何非法用途");
     }
 }
