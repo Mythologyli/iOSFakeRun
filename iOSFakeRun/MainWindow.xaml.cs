@@ -119,10 +119,6 @@ public partial class MainWindow : Window
         var routeText = TextBoxRoute.Text;
         var routeList = new ArrayList();
 
-        var writer = new StreamWriter("./route.save", false);
-        writer.WriteLine(routeText);
-        writer.Close();
-
         try
         {
             if (!routeText.Substring(0, 1).Equals("["))
@@ -154,6 +150,10 @@ public partial class MainWindow : Window
             MessageBox.Show("解析路径数据失败\n请确保路径格式合法");
             return;
         }
+        
+        var writer = new StreamWriter("./route.save", false);
+        writer.WriteLine(routeText);
+        writer.Close();
 
         var routeFixedList = new ArrayList();
         foreach (double[] route in routeList)
