@@ -5,7 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="iOS Fake Run" Height="450" Width="800">
+
     <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Resources/background.png" Opacity="0.8" Stretch="UniformToFill" />
+        </Grid.Background>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
@@ -16,7 +21,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" x:Name="TextBoxRoute" TextWrapping="Wrap" />
+        <TextBox Background="Transparent" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="5,5,5,5" x:Name="TextBoxRoute" TextWrapping="Wrap" />
 
         <Grid Grid.Row="0" Grid.Column="1">
             <Grid.RowDefinitions>
@@ -29,11 +34,10 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Row="0" Grid.Column="0" x:Name="ButtonLink" Click="Link">Link</Button>
-            <Button Grid.Row="0" Grid.Column="1" x:Name="ButtonUnLink" Click="UnLink">Unlink</Button>
-            <Button Grid.Row="1" Grid.Column="0" x:Name="ButtonResetLocation" Click="ResetLocation">Reset location</Button>
-            <Button Grid.Row="1" Grid.Column="1" x:Name="ButtonQuit" Click="Quit">Quit</Button>
-
+            <Button Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonLink" Click="Link">Link</Button>
+            <Button Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,20,20,20" x:Name="ButtonUnLink" Click="UnLink">Unlink</Button>
+            <Button Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonResetLocation" Click="ResetLocation">Reset location</Button>
+            <Button Background="Transparent" Grid.Row="1" Grid.Column="1" Margin="20,20,20,20" x:Name="ButtonQuit" Click="Quit">Quit</Button>
         </Grid>
 
         <Grid Grid.Row="1" Grid.Column="1">
@@ -48,11 +52,12 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ProgressBar Grid.Row="0" Grid.Column="0" Name="ProgressBarRun" />
+            <ProgressBar Grid.Row="0" Grid.Column="0" Margin="20,0,20,0" Name="ProgressBarRun" />
 
-            <Label Grid.Row="1" Grid.Column="0" x:Name="LabelRun">Not running now.</Label>
+            <Label Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,5,20,5" x:Name="LabelRun">Not running now.</Label>
 
-            <Button Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" x:Name="ButtonRun" Click="StartRun">Run</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonRun" Click="StartRun">Run</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">Stop</Button>
         </Grid>
     </Grid>
 </Window>
