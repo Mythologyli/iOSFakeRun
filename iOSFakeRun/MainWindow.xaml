@@ -4,7 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="iOS Fake Run" Height="450" Width="800">
+        Title="iOS Fake Run" Height="450" Width="800" Icon="Resources/icon.png">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}"
+               BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontFamily" Value="fangsong" />
+        </Style>
+
+        <Style TargetType="{x:Type Label}"
+               BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontFamily" Value="fangsong" />
+        </Style>
+        
+        <Style TargetType="{x:Type TextBox}"
+               BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="FontWeight" Value="bold" />
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.Background>
@@ -34,10 +53,10 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonLink" Click="Link">Link</Button>
-            <Button Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,20,20,20" x:Name="ButtonUnLink" Click="UnLink">Unlink</Button>
-            <Button Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonResetLocation" Click="ResetLocation">Reset location</Button>
-            <Button Background="Transparent" Grid.Row="1" Grid.Column="1" Margin="20,20,20,20" x:Name="ButtonQuit" Click="Quit">Quit</Button>
+            <Button Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonLink" Click="Link">连接</Button>
+            <Button Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,20,20,20" x:Name="ButtonUnlink" Click="UnLink">断开</Button>
+            <Button Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonResetLocation" Click="ResetLocation">重置定位</Button>
+            <Button Background="Transparent" Grid.Row="1" Grid.Column="1" Margin="20,20,20,20" x:Name="ButtonQuit" Click="Quit">退出</Button>
         </Grid>
 
         <Grid Grid.Row="1" Grid.Column="1">
@@ -54,10 +73,10 @@
 
             <ProgressBar Grid.Row="0" Grid.Column="0" Margin="20,0,20,0" Name="ProgressBarRun" />
 
-            <Label Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,5,20,5" x:Name="LabelRun">Not running now.</Label>
+            <Label Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,5,20,5" x:Name="LabelRun">未在跑步状态</Label>
 
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonRun" Click="StartRun">Run</Button>
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">Stop</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonRun" Click="StartRun">开始跑步</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,20,20,20" x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">停止跑步</Button>
         </Grid>
     </Grid>
 </Window>

@@ -41,7 +41,7 @@ public partial class MainWindow : Window
         _ideviceInstance.idevice_get_device_list(out var udids, ref count);
         if (udids.Count == 0)
         {
-            MessageBox.Show("No device or fail to load device.");
+            MessageBox.Show("无设备连接");
             return;
         }
 
@@ -50,34 +50,46 @@ public partial class MainWindow : Window
 
         if (!Utils.GetVersion(_lockdownClient, out var iosVersion))
         {
-            MessageBox.Show("Fail to get iOS version.");
+            _idevice?.Dispose();
+            _lockdownClient?.Dispose();
+
+            _idevice = null;
+            _lockdownClient = null;
+
+            MessageBox.Show("获取 iOS 版本失败");
             return;
         }
 
         if (!Image.MountImage(_idevice, _lockdownClient, iosVersion))
         {
-            MessageBox.Show("Fail to mount image.");
+            _idevice?.Dispose();
+            _lockdownClient?.Dispose();
+
+            _idevice = null;
+            _lockdownClient = null;
+
+            MessageBox.Show($"挂载开发者镜像失败\n请检查 DeveloperDiskImage 文件夹下是否有 {iosVersion} 版本的开发者镜像\n请确保设备未处于锁屏状态");
             return;
         }
 
-        MessageBox.Show("Successfully link.");
+        MessageBox.Show("成功连接");
     }
 
     private void ResetLocation(object sender, RoutedEventArgs e)
     {
         if (_idevice == null)
         {
-            MessageBox.Show("Link first!");
+            MessageBox.Show("请先连接设备");
             return;
         }
 
         if (!Location.ResetLocation(_idevice, _lockdownClient))
         {
-            MessageBox.Show("Fail to reset location.\nCheck your link and try to click link again.");
+            MessageBox.Show("重置定位失败\n请检查是否连接并尝试再次点击连接按钮");
             return;
         }
 
-        MessageBox.Show("Successfully reset location.");
+        MessageBox.Show("成功重置定位");
     }
 
     private void UnLink(object sender, RoutedEventArgs e)
@@ -88,7 +100,7 @@ public partial class MainWindow : Window
         _idevice = null;
         _lockdownClient = null;
 
-        MessageBox.Show("Successfully unlink.");
+        MessageBox.Show("成功断开连接");
     }
 
     private void Quit(object sender, RoutedEventArgs e)
@@ -126,7 +138,7 @@ public partial class MainWindow : Window
 
                 if (latitudeToken == null || longitudeToken == null)
                 {
-                    MessageBox.Show("Error occurred when parsing JSON.");
+                    MessageBox.Show("解析路径数据失败\n请确保路径格式合法");
                     return;
                 }
 
@@ -139,7 +151,7 @@ public partial class MainWindow : Window
         }
         catch (Exception)
         {
-            MessageBox.Show("Error occurred when parsing JSON.");
+            MessageBox.Show("解析路径数据失败\n请确保路径格式合法");
             return;
         }
 
@@ -155,7 +167,7 @@ public partial class MainWindow : Window
             {
                 ButtonRun.Visibility = Visibility.Hidden;
                 ButtonStop.Visibility = Visibility.Visible;
-                LabelRun.Content = "Running now...";
+                LabelRun.Content = "正在跑步中...";
                 ProgressBarRun.Value = 0.0;
             });
             var routeNumber = routeFixedList.Count;
@@ -168,12 +180,12 @@ public partial class MainWindow : Window
                     if (_isRunning)
                     {
                         _isRunning = false;
-                        MessageBox.Show("Fail to set location.\nCheck your link and try to click link again.");
+                        MessageBox.Show("修改定位失败\n请检查是否连接并尝试再次点击连接按钮");
                     }
 
                     LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate
                     {
-                        LabelRun.Content = "Not running now.";
+                        LabelRun.Content = "未在跑步状态";
                         ButtonRun.Visibility = Visibility.Visible;
                         ButtonStop.Visibility = Visibility.Hidden;
                         ProgressBarRun.Value = 0.0;
@@ -191,7 +203,7 @@ public partial class MainWindow : Window
             _isRunning = false;
             LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate
             {
-                LabelRun.Content = "Finish running!";
+                LabelRun.Content = "跑步完成";
                 ButtonRun.Visibility = Visibility.Visible;
                 ButtonStop.Visibility = Visibility.Hidden;
             });
