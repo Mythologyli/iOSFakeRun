@@ -3,8 +3,15 @@ using iMobileDevice.Lockdown;
 
 namespace iOSFakeRun.FakeRun;
 
-internal static class Utils
+internal static class DeviceUtils
 {
+    public static bool GetName(LockdownClientHandle? lockdownClient, out string deviceName)
+    {
+        deviceName = "";
+
+        return LibiMobileDevice.Instance.Lockdown.lockdownd_get_device_name(lockdownClient, out deviceName) == LockdownError.Success;
+    }
+
     public static bool GetVersion(LockdownClientHandle? lockdownClient, out string iosVersion)
     {
         iosVersion = "";
