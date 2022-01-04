@@ -48,7 +48,7 @@ public partial class MainWindow : Window
         _ideviceInstance.idevice_new(out _idevice, udids[0]).ThrowOnError();
         _lockdownInstance.lockdownd_client_new_with_handshake(_idevice, out _lockdownClient, "iOSFakeRun").ThrowOnError();
 
-        if (!Utils.GetVersion(_lockdownClient, out var iosVersion))
+        if (!DeviceUtils.GetName(_lockdownClient, out var deviceName) || !DeviceUtils.GetVersion(_lockdownClient, out var iosVersion))
         {
             _idevice?.Dispose();
             _lockdownClient?.Dispose();
@@ -56,9 +56,11 @@ public partial class MainWindow : Window
             _idevice = null;
             _lockdownClient = null;
 
-            MessageBox.Show("获取 iOS 版本失败");
+            MessageBox.Show("读取设备信息失败");
             return;
         }
+
+        StatusBarTextBlock.Text = $"设备名称: {deviceName}    iOS 版本: {iosVersion}";
 
         if (!Image.MountImage(_idevice, _lockdownClient, iosVersion))
         {
@@ -150,7 +152,7 @@ public partial class MainWindow : Window
             MessageBox.Show("解析路径数据失败\n请确保路径格式合法");
             return;
         }
-        
+
         var writer = new StreamWriter("./route.save", false);
         writer.WriteLine(routeText);
         writer.Close();
@@ -216,5 +218,10 @@ public partial class MainWindow : Window
     private void StopRun(object sender, RoutedEventArgs e)
     {
         _isRunning = false;
+    }
+
+    private void About(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show("iOS Fake Run v0.1\n作者: Myth\n\n请勿将本工具用于任何非法用途");
     }
 }
