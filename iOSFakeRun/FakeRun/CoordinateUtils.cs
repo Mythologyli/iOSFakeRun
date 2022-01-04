@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace iOSFakeRun.FakeRun;
 
-internal static class CoordinateConvertor
+internal static class CoordinateUtils
 {
     private const double XPi = 3.14159265358979324 * 3000.0 / 180.0;
     private const double Pi = 3.1415926535897932384626;
     private const double A = 6378245.0;
     private const double E = 0.00669342162296594323;
+    private const double EarthRadius = 6378137;
 
     public static double[] Bd09ToWgs84(double latitude, double longitude)
     {
@@ -58,5 +60,39 @@ internal static class CoordinateConvertor
         ret += (150.0 * Math.Sin(longitude / 12.0 * Pi) + 300.0 * Math.Sin(longitude / 30.0 * Pi)) * 2.0 / 3.0;
 
         return ret;
+    }
+
+    public static double CalcDistance(double[] pointA, double[] pointB)
+    {
+        var radLatitudeA = Rad(pointA[0]);
+        var radLongitudeA = Rad(pointA[1]);
+        var radLatitudeB = Rad(pointB[0]);
+        var radLongitudeB = Rad(pointB[1]);
+        var a = radLatitudeA - radLatitudeB;
+        var b = radLongitudeA - radLongitudeB;
+        var distance = 2 * Math.Asin(Math.Sqrt(Math.Pow(Math.Sin(a / 2), 2) + Math.Cos(radLatitudeA) * Math.Cos(radLatitudeB) * Math.Pow(Math.Sin(b / 2), 2))) * EarthRadius;
+
+        return distance;
+    }
+
+    private static double Rad(double d)
+    {
+        return d * Math.PI / 180d;
+    }
+
+    public static List<double[]> CutLineToPoints(double[] pointA, double[] pointB, int sunLineNumber)
+    {
+        var pointList = new List<double[]>();
+
+        var deltaX = (pointB[0] - pointA[0]) / sunLineNumber;
+        var deltaY = (pointB[1] - pointA[1]) / sunLineNumber;
+
+        for (var i = 1; i < sunLineNumber + 1; i++)
+        {
+            double[] point = {pointA[0] + i * deltaX, pointA[1] + i * deltaY};
+            pointList.Add(point);
+        }
+
+        return pointList;
     }
 }
