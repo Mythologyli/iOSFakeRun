@@ -5,7 +5,7 @@ using iMobileDevice.iDevice;
 using iMobileDevice.Lockdown;
 using iMobileDevice.Service;
 
-namespace iOSFakeRun;
+namespace iOSFakeRun.FakeRun;
 
 internal static class Location
 {

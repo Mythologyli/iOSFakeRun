@@ -6,6 +6,7 @@ using System.Windows;
 using iMobileDevice;
 using iMobileDevice.iDevice;
 using iMobileDevice.Lockdown;
+using iOSFakeRun.FakeRun;
 using Newtonsoft.Json.Linq;
 
 namespace iOSFakeRun;
@@ -15,6 +16,7 @@ public partial class MainWindow : Window
     private readonly IiDeviceApi _ideviceInstance = LibiMobileDevice.Instance.iDevice;
     private readonly ILockdownApi _lockdownInstance = LibiMobileDevice.Instance.Lockdown;
     private iDeviceHandle? _idevice;
+    private bool _isRunning;
     private LockdownClientHandle? _lockdownClient;
 
     public MainWindow()
@@ -149,17 +151,33 @@ public partial class MainWindow : Window
 
         var runThread = new Thread(() =>
         {
-            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { LabelRun.Content = "Running now..."; });
-            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { ProgressBarRun.Value = 0.0; });
+            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate
+            {
+                ButtonRun.Visibility = Visibility.Hidden;
+                ButtonStop.Visibility = Visibility.Visible;
+                LabelRun.Content = "Running now...";
+                ProgressBarRun.Value = 0.0;
+            });
             var routeNumber = routeFixedList.Count;
             var i = 0;
 
             foreach (double[] route in routeFixedList)
             {
-                if (!Location.SetLocation(_idevice, _lockdownClient, route[0], route[1]))
+                if (!_isRunning || !Location.SetLocation(_idevice, _lockdownClient, route[0], route[1]))
                 {
-                    MessageBox.Show("Fail to set location.\nCheck your link and try to click link again.");
-                    LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { LabelRun.Content = "Not running now."; });
+                    if (_isRunning)
+                    {
+                        _isRunning = false;
+                        MessageBox.Show("Fail to set location.\nCheck your link and try to click link again.");
+                    }
+
+                    LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate
+                    {
+                        LabelRun.Content = "Not running now.";
+                        ButtonRun.Visibility = Visibility.Visible;
+                        ButtonStop.Visibility = Visibility.Hidden;
+                        ProgressBarRun.Value = 0.0;
+                    });
 
                     return;
                 }
@@ -170,9 +188,21 @@ public partial class MainWindow : Window
                 LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { ProgressBarRun.Value = (double) iOut / routeNumber * ProgressBarRun.Maximum; });
             }
 
-            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate { LabelRun.Content = "Finish running!"; });
+            _isRunning = false;
+            LabelRun.Dispatcher.BeginInvoke((ThreadStart) delegate
+            {
+                LabelRun.Content = "Finish running!";
+                ButtonRun.Visibility = Visibility.Visible;
+                ButtonStop.Visibility = Visibility.Hidden;
+            });
         });
 
+        _isRunning = true;
         runThread.Start();
+    }
+
+    private void StopRun(object sender, RoutedEventArgs e)
+    {
+        _isRunning = false;
     }
 }

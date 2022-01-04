@@ -6,7 +6,7 @@ using iMobileDevice.iDevice;
 using iMobileDevice.Lockdown;
 using iMobileDevice.MobileImageMounter;
 
-namespace iOSFakeRun;
+namespace iOSFakeRun.FakeRun;
 
 internal static class Image
 {
