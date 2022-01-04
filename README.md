@@ -6,7 +6,7 @@
 
 ## 使用方法
 
-+ 下载 iOS Fake Run 软件并解压到空文件夹中
++ 下载 [iOS Fake Run](https://github.com/Mythologyli/iOSFakeRun/releases) 软件并解压到空文件夹中
 + 虚拟定位需要开发者镜像。软件预置了 iOS 14 和 iOS 15 的开发者镜像。如果你的 iOS 版本低于 14，请执行以下步骤:
     + 进入 [DeveloperDiskImage](https://github.com/pdso/DeveloperDiskImage) 仓库
     + 查看自己的 iOS 版本，下载对应的 DeveloperDiskImage.dmg 和 DeveloperDiskImage.dmg.signature
