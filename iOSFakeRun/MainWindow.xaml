@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="iOS Fake Run" Height="450" Width="800" Icon="Resources/icon.png">
+        Title="iOS Fake Run" Height="450" Width="800" Icon="Resources/icon.ico">
 
     <Window.Resources>
         <Style TargetType="{x:Type Button}"

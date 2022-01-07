@@ -5,17 +5,18 @@
         <TargetFramework>net6.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
+        <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Extended.Wpf.Toolkit" Version="4.2.0"/>
-        <PackageReference Include="iMobileDevice-net" Version="1.3.17"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="Extended.Wpf.Toolkit" Version="4.2.0" />
+        <PackageReference Include="iMobileDevice-net" Version="1.3.17" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <Resource Include="Resources\background.png"/>
-        <Resource Include="Resources\icon.png"/>
+        <Resource Include="Resources\background.png" />
+        <Resource Include="Resources\icon.ico" />
     </ItemGroup>
 
 </Project>
