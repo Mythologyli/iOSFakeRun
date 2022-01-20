@@ -83,6 +83,10 @@ internal static class Image
                         }
                     }
                 }
+                catch (Exception exception)
+                {
+                    return false;
+                }
                 finally
                 {
                     if (mounterClient != null && !mounterClient.IsClosed)

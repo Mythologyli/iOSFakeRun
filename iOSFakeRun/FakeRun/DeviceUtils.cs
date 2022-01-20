@@ -25,6 +25,9 @@ internal static class DeviceUtils
         {
             LibiMobileDevice.Instance.Plist.plist_get_string_val(plistHandle, out iosVersion);
 
+            var stringTempList = iosVersion.Split(".");
+            iosVersion = stringTempList[0] + "." + stringTempList[1];
+
             return true;
         }
     }
