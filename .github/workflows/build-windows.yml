@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: dotnet build -c Release -o iOSFakeRun-Windows/iOSFakeRun-Windows
       - name: Get DeveloperDiskImage
-        run: cd iOSFakeRun-Windows/iOSFakeRun-Windows && git clone https://github.com/pdso/DeveloperDiskImage.git --depth=1
+        run: cd iOSFakeRun-Windows/iOSFakeRun-Windows && git clone https://github.com/GPSfaker/DeveloperDiskImage.git --depth=1
       - name: Delete iOS 13 or earlier  
         run: cd iOSFakeRun-Windows/iOSFakeRun-Windows/DeveloperDiskImage && ls -name | select-string -pattern ".*?1[1-3].*?" | %{rm $_ -Recurse -Force -Confirm:$false}
       - name: Clean DeveloperDiskImage folder
