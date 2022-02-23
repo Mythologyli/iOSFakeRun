@@ -6,7 +6,7 @@
 
 ## 使用方法
 
-+ 如果你的电脑不具有 .NET 6.0 环境，请在 [此处](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) 下载并安装 .NET Desktop Runtime 6.0.1
++ 如果你的电脑不具有 .NET 6.0 环境，请在 [此处](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) 下载并安装 .NET Desktop Runtime 6.0.2
 + 下载 [iOS Fake Run](https://github.com/Mythologyli/iOSFakeRun/releases) 软件并解压到空文件夹中
 + 虚拟定位需要开发者镜像。软件预置了 iOS 14 和 iOS 15 的开发者镜像。如果你的 iOS 版本低于 14，请执行以下步骤:
     + 进入 [DeveloperDiskImage](https://github.com/pdso/DeveloperDiskImage) 仓库
