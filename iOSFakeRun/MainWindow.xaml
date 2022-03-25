@@ -121,7 +121,7 @@
                 <Label Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="20,10,0,10" x:Name="LabelRunTimes">循环次数</Label>
                 <xctk:IntegerUpDown Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,10,0,10" Increment="1" Minimum="1" Value="9" x:Name="IntegerUpDownRunTimes" />
                 <Label Background="Transparent" Grid.Row="0" Grid.Column="2" Margin="20,10,0,10" x:Name="LabelSpeed">跑步速度 m/s</Label>
-                <xctk:DoubleUpDown Background="Transparent" Grid.Row="0" Grid.Column="3" Margin="20,10,20,10" Increment="0.5" Maximum="10.0" Minimum="0.1" Value="4.5"
+                <xctk:DoubleUpDown Background="Transparent" Grid.Row="0" Grid.Column="3" Margin="20,10,20,10" Increment="0.5" Maximum="10.0" Minimum="0.1" Value="3"
                                    x:Name="DoubleUpDownSpeed" />
             </Grid>
 

@@ -83,7 +83,7 @@ internal static class Image
                         }
                     }
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
                     return false;
                 }
