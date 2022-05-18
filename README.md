@@ -2,14 +2,14 @@
 
 基于虚拟定位的 iOS 虚拟跑步
 
-![](./image/main_windows.png)
+![](./docs/main_windows.png)
 
 ## 使用方法
 
-+ 如果你的电脑不具有 .NET 6.0 环境，请在 [此处](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) 下载并安装 .NET Desktop Runtime 6.0.2
++ 如果你的电脑不具有 .NET 6.0 环境，请在 [此处](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) 下载并安装 .NET Desktop Runtime 6.0.5
 + 下载 [iOS Fake Run](https://github.com/Mythologyli/iOSFakeRun/releases) 软件并解压到空文件夹中
 + 虚拟定位需要开发者镜像。软件预置了 iOS 14 和 iOS 15 的开发者镜像。如果你的 iOS 版本低于 14，请执行以下步骤:
-    + 进入 [DeveloperDiskImage](https://github.com/pdso/DeveloperDiskImage) 仓库
+    + 进入 [DeveloperDiskImage](https://github.com/Mythologyli/DeveloperDiskImage) 仓库
     + 查看自己的 iOS 版本，下载对应的 DeveloperDiskImage.dmg 和 DeveloperDiskImage.dmg.signature
     + 进入 iOS Fake Run 软件文件夹。在 DeveloperDiskImage 文件夹中建立以版本号为名称的文件夹（如 13.7），将刚才下载的两个文件放入此文件夹
 + 打开[路径拾取网站](https://baidumap.akashic.cc)。通过点击地图构造路径。点击时无需考虑间距，会自动用直线连接。路径点击完成后，单击上方的路径坐标——复制，将坐标数据复制到剪贴板
