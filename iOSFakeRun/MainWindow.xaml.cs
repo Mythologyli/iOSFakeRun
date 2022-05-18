@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace iOSFakeRun;
 
-public partial class MainWindow : Window
+public partial class MainWindow
 {
     private readonly IiDeviceApi _ideviceInstance = LibiMobileDevice.Instance.iDevice;
     private readonly ILockdownApi _lockdownInstance = LibiMobileDevice.Instance.Lockdown;
@@ -266,6 +266,6 @@ public partial class MainWindow : Window
 
     private void About(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("iOS Fake Run\n版本: v0.4\n作者: Myth\n\n请勿将本工具用于任何非法用途");
+        MessageBox.Show("iOS Fake Run\n版本: v0.5\n作者: Myth\n\n请勿将本工具用于任何非法用途");
     }
 }

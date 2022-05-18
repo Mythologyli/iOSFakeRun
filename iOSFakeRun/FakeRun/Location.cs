@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using iMobileDevice;
 using iMobileDevice.iDevice;
@@ -27,8 +28,8 @@ internal static class Location
                LockdownError.Success &&
                LibiMobileDevice.Instance.Service.service_client_new(idevice, lockdownServiceDescriptor, out var locationServiceClient) == ServiceError.Success &&
                SendUInt(locationServiceClient, 0u) &&
-               SendString(locationServiceClient, latitude.ToString()) &&
-               SendString(locationServiceClient, longitude.ToString());
+               SendString(locationServiceClient, latitude.ToString(CultureInfo.InvariantCulture)) &&
+               SendString(locationServiceClient, longitude.ToString(CultureInfo.InvariantCulture));
     }
 
     private static bool SendUInt(ServiceClientHandle locationServiceClient, uint value)
