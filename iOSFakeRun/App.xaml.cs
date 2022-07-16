@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace iOSFakeRun;
+﻿namespace iOSFakeRun;
 
 /// <summary>
 ///     Interaction logic for App.xaml
