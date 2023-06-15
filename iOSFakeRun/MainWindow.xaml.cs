@@ -266,6 +266,6 @@ public partial class MainWindow
 
     private void About(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("iOS Fake Run\n版本: v0.7\n作者: Myth\n\n请勿将本工具用于任何非法用途");
+        MessageBox.Show("iOS Fake Run\n版本: v0.8\n作者: Myth\n\n请勿将本工具用于任何非法用途");
     }
 }
