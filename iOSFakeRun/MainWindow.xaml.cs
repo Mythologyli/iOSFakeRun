@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -137,6 +138,16 @@ public partial class MainWindow
 
                 if (latitudeToken == null || longitudeToken == null)
                 {
+                    var errorLogWriter = new StreamWriter("./error.log", false);
+                    errorLogWriter.WriteLine("Time: " + DateTime.Now);
+                    errorLogWriter.WriteLine("Windows Version: " + Environment.OSVersion);
+                    errorLogWriter.WriteLine("Windows Language: " + CultureInfo.InstalledUICulture.Name);
+                    errorLogWriter.WriteLine("Point Text: " + pointText);
+                    errorLogWriter.WriteLine("Current Latitude Token: " + latitudeToken);
+                    errorLogWriter.WriteLine("Current Longitude Token: " + longitudeToken);
+
+                    errorLogWriter.Close();
+
                     MessageBox.Show("解析路径数据失败\n请将路径从网页复制到左侧文本框内并确保数据格式合法");
                     return;
                 }
@@ -148,8 +159,17 @@ public partial class MainWindow
                 pointList.Add(route);
             }
         }
-        catch (Exception)
+        catch (Exception exception)
         {
+            var errorLogWriter = new StreamWriter("./error.log", false);
+            errorLogWriter.WriteLine("Time: " + DateTime.Now);
+            errorLogWriter.WriteLine("Windows Version: " + Environment.OSVersion);
+            errorLogWriter.WriteLine("Windows Language: " + CultureInfo.InstalledUICulture.Name);
+            errorLogWriter.WriteLine("Point Text: " + pointText);
+            errorLogWriter.WriteLine("Exception: " + exception.Message);
+
+            errorLogWriter.Close();
+
             MessageBox.Show("解析路径数据失败\n请将路径从网页复制到左侧文本框内并确保数据格式合法");
             return;
         }
