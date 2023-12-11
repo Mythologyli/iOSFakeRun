@@ -125,8 +125,10 @@
                                    x:Name="DoubleUpDownSpeed" />
             </Grid>
 
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,20,5" x:Name="ButtonRun" Click="StartRun">开始跑步</Button>
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,20,5" x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">停止跑步</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,20,5" x:Name="ButtonRun" Click="StartRun" >开始跑步</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="200,5,20,5" x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">停止跑步</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,220,5" x:Name="ButtonPause" Click="PauseRun" Visibility="Hidden">暂停跑步</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,220,5" x:Name="ButtonResume" Click="ResumeRun" Visibility="Hidden" >恢复跑步</Button>
         </Grid>
     </Grid>
 </Window>

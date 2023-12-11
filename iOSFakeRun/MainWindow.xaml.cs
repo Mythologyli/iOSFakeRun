@@ -18,9 +18,12 @@ public partial class MainWindow
     private readonly IiDeviceApi _ideviceInstance = LibiMobileDevice.Instance.iDevice;
     private readonly ILockdownApi _lockdownInstance = LibiMobileDevice.Instance.Lockdown;
     private iDeviceHandle? _idevice;
-    private bool _isRunning;
+    private bool _isRunning, _isPaused;
     private LockdownClientHandle? _lockdownClient;
-
+    private int tmpPoint, tmpTime,totalRunTimes;
+    private double metersPerSecond, barPercentage;
+    private List<double[]> pointFixedList, pointList;
+    
     public MainWindow()
     {
         InitializeComponent();
@@ -48,9 +51,11 @@ public partial class MainWindow
         }
 
         _ideviceInstance.idevice_new(out _idevice, udids[0]).ThrowOnError();
-        _lockdownInstance.lockdownd_client_new_with_handshake(_idevice, out _lockdownClient, "iOSFakeRun").ThrowOnError();
+        _lockdownInstance.lockdownd_client_new_with_handshake(_idevice, out _lockdownClient, "iOSFakeRun")
+            .ThrowOnError();
 
-        if (!DeviceUtils.GetName(_lockdownClient, out var deviceName) || !DeviceUtils.GetVersion(_lockdownClient, out var iosVersion))
+        if (!DeviceUtils.GetName(_lockdownClient, out var deviceName) ||
+            !DeviceUtils.GetVersion(_lockdownClient, out var iosVersion))
         {
             _idevice?.Dispose();
             _lockdownClient?.Dispose();
@@ -118,11 +123,129 @@ public partial class MainWindow
         Close();
     }
 
+    public void RunThreadLogic(List<double[]> inPointFixedList, List<double[]> inPointList,double metersPerSecond, int totalRunTimes)
+    {
+        StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart)delegate
+        {
+            ButtonRun.Visibility = Visibility.Hidden;
+            ButtonStop.Visibility = Visibility.Visible;
+            ButtonPause.Visibility = Visibility.Visible;
+            IntegerUpDownRunTimes.IsEnabled = false;
+            DoubleUpDownSpeed.IsEnabled = false;
+            StatusBarTextBlock.Text = "正在跑步中...";
+            ProgressBarRun.Value = 0.0;
+        });
+
+        var pointFixedNumber = inPointFixedList.Count;
+
+        var pointTrueList = new List<double[]> { inPointFixedList[0] };
+
+        for (var i = 0; i < pointFixedNumber - 1;)
+        {
+            var distance = CoordinateUtils.CalcDistance(inPointFixedList[i], inPointFixedList.Last());
+
+            var j = i + 1;
+            for (; j < pointFixedNumber; j++)
+            {
+                distance = CoordinateUtils.CalcDistance(inPointFixedList[i], inPointFixedList[j]);
+
+                if (!(distance > metersPerSecond))
+                {
+                    continue;
+                }
+
+                break;
+            }
+
+            inPointList = CoordinateUtils.CutLineToPoints(inPointFixedList[i], inPointFixedList[j],
+                (int)(distance / metersPerSecond));
+            pointTrueList.AddRange(inPointList);
+
+            i = j;
+        }
+
+        var pointTrueNumber = pointTrueList.Count;
+        for (var time = tmpTime; time < totalRunTimes; time++)
+        {
+            for (var i = tmpPoint; i < pointTrueNumber; i++)
+            {
+                tmpPoint = i;
+                tmpTime = time;
+                if (!_isRunning ||
+                    !Location.SetLocation(_idevice, _lockdownClient, pointTrueList[i][0], pointTrueList[i][1]))
+                {
+                    if (_isRunning)
+                    {
+                        _isRunning = false;
+                        MessageBox.Show("修改定位失败\n请检查是否连接并尝试再次点击连接按钮");
+                    }
+
+                    if (_isPaused)
+                    {
+                        StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart)delegate
+                        {
+                            StatusBarTextBlock.Text = "未在跑步状态";
+                            ButtonRun.Visibility = Visibility.Hidden;
+                            ButtonPause.Visibility = Visibility.Hidden;
+                            ButtonStop.Visibility = Visibility.Visible;
+                            ButtonResume.Visibility = Visibility.Visible;
+                            IntegerUpDownRunTimes.IsEnabled = true;
+                            DoubleUpDownSpeed.IsEnabled = true;
+                            ProgressBarRun.Value = barPercentage;
+
+                        });
+                    }
+                    else
+                    {
+                        StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart)delegate
+                        {
+                            StatusBarTextBlock.Text = "未在跑步状态";
+                            ButtonRun.Visibility = Visibility.Visible;
+                            ButtonPause.Visibility = Visibility.Hidden;
+                            ButtonStop.Visibility = Visibility.Hidden;
+                            IntegerUpDownRunTimes.IsEnabled = true;
+                            DoubleUpDownSpeed.IsEnabled = true;
+                            ProgressBarRun.Value = barPercentage;
+                        });
+                    }
+
+                    return;
+                }
+
+                Thread.Sleep(1000);
+                i++;
+                var iOut = i;
+                var timeNow = time;
+                ProgressBarRun.Dispatcher.BeginInvoke((ThreadStart)delegate
+                {
+                    ProgressBarRun.Value =
+                        ((double)iOut / (pointTrueNumber * totalRunTimes) + (double)timeNow / totalRunTimes) *
+                        ProgressBarRun.Maximum;
+                        barPercentage =ProgressBarRun.Value;
+                });
+            }
+        }
+
+        _isRunning = false;
+        StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart)delegate
+        {
+            StatusBarTextBlock.Text = "跑步完成";
+            ButtonRun.Visibility = Visibility.Visible;
+            ButtonStop.Visibility = Visibility.Hidden;
+            ButtonPause.Visibility = Visibility.Hidden;
+            ButtonResume.Visibility = Visibility.Hidden;
+            IntegerUpDownRunTimes.IsEnabled = true;
+            DoubleUpDownSpeed.IsEnabled = true;
+        });
+    }
+
     private void StartRun(object sender, RoutedEventArgs e)
     {
         var pointText = TextBoxRoute.Text;
-        var pointList = new List<double[]>();
-
+        pointList = new List<double[]>();
+        tmpTime = 0;
+        tmpPoint = 0;
+        barPercentage = 0.0;
         try
         {
             if (!pointText.Substring(0, 1).Equals("["))
@@ -155,7 +278,7 @@ public partial class MainWindow
                 var latitude = double.Parse(latitudeToken.ToString());
                 var longitude = double.Parse(longitudeToken.ToString());
 
-                double[] route = {latitude, longitude};
+                double[] route = { latitude, longitude };
                 pointList.Add(route);
             }
         }
@@ -178,110 +301,52 @@ public partial class MainWindow
         writer.WriteLine(pointText);
         writer.Close();
 
-        var pointFixedList = pointList.Select(point => CoordinateUtils.Bd09ToWgs84(point[0], point[1])).ToList();
-
-        var metersPerSecond = DoubleUpDownSpeed.Value ?? 0.0;
-        var totalRunTimes = IntegerUpDownRunTimes.Value ?? 1;
+        pointFixedList = pointList.Select(point => CoordinateUtils.Bd09ToWgs84(point[0], point[1])).ToList();
+        
+        metersPerSecond = DoubleUpDownSpeed.Value ?? 0.0;
+        totalRunTimes = IntegerUpDownRunTimes.Value ?? 1;
 
         if (totalRunTimes > 1)
         {
             pointFixedList.Add(pointFixedList[0]);
         }
-
-        var runThread = new Thread(() =>
-        {
-            StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart) delegate
-            {
-                ButtonRun.Visibility = Visibility.Hidden;
-                ButtonStop.Visibility = Visibility.Visible;
-                IntegerUpDownRunTimes.IsEnabled = false;
-                DoubleUpDownSpeed.IsEnabled = false;
-                StatusBarTextBlock.Text = "正在跑步中...";
-                ProgressBarRun.Value = 0.0;
-            });
-
-            var pointFixedNumber = pointFixedList.Count;
-
-            var pointTrueList = new List<double[]> {pointFixedList[0]};
-
-            for (var i = 0; i < pointFixedNumber - 1;)
-            {
-                var distance = CoordinateUtils.CalcDistance(pointFixedList[i], pointFixedList.Last());
-
-                var j = i + 1;
-                for (; j < pointFixedNumber; j++)
-                {
-                    distance = CoordinateUtils.CalcDistance(pointFixedList[i], pointFixedList[j]);
-
-                    if (!(distance > metersPerSecond))
-                    {
-                        continue;
-                    }
-
-                    break;
-                }
-
-                pointList = CoordinateUtils.CutLineToPoints(pointFixedList[i], pointFixedList[j], (int) (distance / metersPerSecond));
-                pointTrueList.AddRange(pointList);
-
-                i = j;
-            }
-
-            var pointTrueNumber = pointTrueList.Count;
-            for (var time = 0; time < totalRunTimes; time++)
-            {
-                for (var i = 0; i < pointTrueNumber; i++)
-                {
-                    if (!_isRunning || !Location.SetLocation(_idevice, _lockdownClient, pointTrueList[i][0], pointTrueList[i][1]))
-                    {
-                        if (_isRunning)
-                        {
-                            _isRunning = false;
-                            MessageBox.Show("修改定位失败\n请检查是否连接并尝试再次点击连接按钮");
-                        }
-
-                        StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart) delegate
-                        {
-                            StatusBarTextBlock.Text = "未在跑步状态";
-                            ButtonRun.Visibility = Visibility.Visible;
-                            ButtonStop.Visibility = Visibility.Hidden;
-                            IntegerUpDownRunTimes.IsEnabled = true;
-                            DoubleUpDownSpeed.IsEnabled = true;
-                            ProgressBarRun.Value = 0.0;
-                        });
-
-                        return;
-                    }
-
-                    Thread.Sleep(1000);
-                    i++;
-                    var iOut = i;
-                    var timeNow = time;
-                    ProgressBarRun.Dispatcher.BeginInvoke((ThreadStart) delegate
-                    {
-                        ProgressBarRun.Value = ((double) iOut / (pointTrueNumber * totalRunTimes) + (double) timeNow / totalRunTimes) * ProgressBarRun.Maximum;
-                    });
-                }
-            }
-
-            _isRunning = false;
-            StatusBarTextBlock.Dispatcher.BeginInvoke((ThreadStart) delegate
-            {
-                StatusBarTextBlock.Text = "跑步完成";
-                ButtonRun.Visibility = Visibility.Visible;
-                ButtonStop.Visibility = Visibility.Hidden;
-                IntegerUpDownRunTimes.IsEnabled = true;
-                DoubleUpDownSpeed.IsEnabled = true;
-            });
-        });
+        
+        var runThread = new Thread(() => RunThreadLogic(pointFixedList, pointList, metersPerSecond, totalRunTimes));
 
         _isRunning = true;
+        _isPaused = false;
+        runThread.Start();
+    }
+
+    private void PauseRun(object sender, RoutedEventArgs e)
+    {
+        _isRunning = false;
+        _isPaused = true;
+        ButtonResume.Visibility = Visibility.Visible;
+        ButtonPause.Visibility = Visibility.Hidden;
+        ButtonRun.Visibility = Visibility.Hidden;
+    }
+
+    private void ResumeRun(object sender, RoutedEventArgs e)
+    {
+        _isRunning = true;
+        _isPaused = false;
+        ButtonPause.Visibility = Visibility.Visible;
+        ButtonResume.Visibility = Visibility.Hidden;
+        ButtonRun.Visibility = Visibility.Hidden;
+        
+        var runThread = new Thread(() => RunThreadLogic(pointFixedList, pointList, metersPerSecond, totalRunTimes));
         runThread.Start();
     }
 
     private void StopRun(object sender, RoutedEventArgs e)
     {
         _isRunning = false;
+        _isPaused = false;
+        ButtonRun.Visibility = Visibility.Visible;
+        ButtonStop.Visibility = Visibility.Hidden;
+        ButtonPause.Visibility = Visibility.Hidden;
+        ButtonResume.Visibility = Visibility.Hidden;
     }
 
     private void About(object sender, RoutedEventArgs e)
