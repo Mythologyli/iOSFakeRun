@@ -71,7 +71,8 @@
             </StatusBar>
         </DockPanel>
 
-        <TextBox Background="Transparent" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Margin="5,5,5,5" x:Name="TextBoxRoute" TextWrapping="Wrap" />
+        <TextBox Background="Transparent" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Margin="5,5,5,5"
+                 x:Name="TextBoxRoute" TextWrapping="Wrap" />
 
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.RowDefinitions>
@@ -84,10 +85,22 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="20,15,20,15" x:Name="ButtonLink" Click="Link">连接</Button>
-            <Button Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,15,20,15" x:Name="ButtonUnlink" Click="UnLink">断开</Button>
-            <Button Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,15,20,15" x:Name="ButtonResetLocation" Click="ResetLocation">重置定位</Button>
-            <Button Background="Transparent" Grid.Row="1" Grid.Column="1" Margin="20,15,20,15" x:Name="ButtonQuit" Click="Quit">退出</Button>
+            <Button Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="20,15,20,15" x:Name="ButtonLink"
+                    Click="Link">
+                连接
+            </Button>
+            <Button Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,15,20,15" x:Name="ButtonUnlink"
+                    Click="UnLink">
+                断开
+            </Button>
+            <Button Background="Transparent" Grid.Row="1" Grid.Column="0" Margin="20,15,20,15"
+                    x:Name="ButtonResetLocation" Click="ResetLocation">
+                重置定位
+            </Button>
+            <Button Background="Transparent" Grid.Row="1" Grid.Column="1" Margin="20,15,20,15" x:Name="ButtonQuit"
+                    Click="Quit">
+                退出
+            </Button>
         </Grid>
 
         <Grid Grid.Row="2" Grid.Column="1">
@@ -100,9 +113,10 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ProgressBar Grid.Row="0" Grid.Column="0" Margin="20,0,20,0" Name="ProgressBarRun">
+            <ProgressBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="20,0,20,0" Name="ProgressBarRun">
                 <ProgressBar.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="0" />
@@ -110,7 +124,7 @@
                 </ProgressBar.Resources>
             </ProgressBar>
 
-            <Grid Grid.Row="1" Grid.Column="0">
+            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -119,16 +133,30 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Background="Transparent" Grid.Row="0" Grid.Column="0" Margin="20,10,0,10" x:Name="LabelRunTimes">循环次数</Label>
-                <xctk:IntegerUpDown Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,10,0,10" Increment="1" Minimum="1" Value="9" x:Name="IntegerUpDownRunTimes" />
+                <xctk:IntegerUpDown Background="Transparent" Grid.Row="0" Grid.Column="1" Margin="20,10,0,10"
+                                    Increment="1" Minimum="1" Value="9" x:Name="IntegerUpDownRunTimes" />
                 <Label Background="Transparent" Grid.Row="0" Grid.Column="2" Margin="20,10,0,10" x:Name="LabelSpeed">跑步速度 m/s</Label>
-                <xctk:DoubleUpDown Background="Transparent" Grid.Row="0" Grid.Column="3" Margin="20,10,20,10" Increment="0.5" Maximum="10.0" Minimum="0.1" Value="3"
+                <xctk:DoubleUpDown Background="Transparent" Grid.Row="0" Grid.Column="3" Margin="20,10,20,10"
+                                   Increment="0.5" Maximum="10.0" Minimum="0.1" Value="3"
                                    x:Name="DoubleUpDownSpeed" />
             </Grid>
 
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,20,5" x:Name="ButtonRun" Click="StartRun" >开始跑步</Button>
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="200,5,20,5" x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">停止跑步</Button>
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,220,5" x:Name="ButtonPause" Click="PauseRun" Visibility="Hidden">暂停跑步</Button>
-            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,220,5" x:Name="ButtonResume" Click="ResumeRun" Visibility="Hidden" >恢复跑步</Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2"
+                    Margin="20,5,20,5" x:Name="ButtonRun" Click="StartRun">
+                开始跑步
+            </Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Margin="20,5,20,5"
+                    x:Name="ButtonStop" Click="StopRun" Visibility="Hidden">
+                停止跑步
+            </Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="20,5,20,5"
+                    x:Name="ButtonPause" Click="PauseRun" Visibility="Hidden">
+                暂停跑步
+            </Button>
+            <Button Background="Transparent" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="20,5,20,5"
+                    x:Name="ButtonResume" Click="ResumeRun" Visibility="Hidden">
+                恢复跑步
+            </Button>
         </Grid>
     </Grid>
 </Window>
